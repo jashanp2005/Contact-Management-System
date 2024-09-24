@@ -1,326 +1,402 @@
 #include <iostream>
-#include<sstream>
-#include<fstream>
+#include <sstream>
+#include <fstream>
 using namespace std;
 
-class Node {
+class Node
+{
 
-    public:
+public:
     string name;
     string number;
-    Node* next;
+    Node *next;
 
-    //constructor
-    Node() {
-      this->name = "";
-      this->number = "";
-      this->next = NULL;
+    // constructor
+    Node()
+    {
+        this->name = "";
+        this->number = "";
+        this->next = NULL;
     }
-
 };
 
-char toLowerCase(char ch){
-    if(ch>='a' && ch<='z'){
+char toLowerCase(char ch)
+{
+    if (ch >= 'a' && ch <= 'z')
+    {
         return ch;
     }
-    else if(ch>='A' && ch<='Z'){
+    else if (ch >= 'A' && ch <= 'Z')
+    {
         char temp = ch - 'A' + 'a';
         return temp;
     }
-  return '#';
+    return '#';
 }
 
-void print(Node* &head) {
-    int cnt = 0;     // To Tell if contact list is empty    
-    if(head == NULL) {
+void print(Node *&head)
+{
+    int cnt = 0; // To Tell if contact list is empty
+    if (head == NULL)
+    {
         cout << "Contact List is empty. " << endl;
-        return ;
+        return;
     }
-    Node* temp = head -> next;
+    Node *temp = head;
 
-    while(temp != NULL && temp -> name != "") {
-        cout << "Name: " << temp -> name << "      ";
-        cout << "Number: " << temp -> number << endl;
-        temp = temp -> next;
+    while (temp != NULL)
+    {
+        cout << "Name: " << temp->name << "      ";
+        cout << "Number: " << temp->number << endl;
+        temp = temp->next;
         cnt++;
     }
-    if(cnt == 0){        // loop never got executed
-      cout << "Contact List is empty. " << endl;
-  }
+
+    if (cnt == 0)
+    { // loop never got executed
+        cout << "Contact List is empty. " << endl;
+    }
     cout << endl;
 }
 
-bool isValidNumber(string num){
-  for(int i =0; i<num.size(); i++){
-    if(((int)num[i]>=48 && (int)num[i]<=57)){
-      continue;
+bool isValidNumber(string num)
+{
+    for (int i = 0; i < num.size(); i++)
+    {
+        if (num[i] >= '0' && num[i] <= '9')
+        {
+            continue;
+        }
+        else
+        {
+            return false;
+        }
     }
-    else{
-      return false;
-    }
-  }
-  return true;
+    return true;
 }
 
-void insertAtHead(Node* &head) {
+void insertAtHead(Node *&head)
+{
 
     // creation of a new node temp
-  Node* temp = new Node();
+    Node *temp = new Node();
     cin.ignore();
     cout << "Enter the name: ";
-    getline(cin, temp -> name);
+    getline(cin, temp->name);
     cout << "Enter the phone number: ";
     string tempNum;
-    cin>>tempNum;
+    cin >> tempNum;
     bool isValid = isValidNumber(tempNum);
-    if(isValid){
-    temp -> number = tempNum;
-  }
-  else{
-    cout<<"Number is not valid";
-    temp->name="";
-  }
+    if (isValid)
+    {
+        temp->number = tempNum;
+    }
+    else
+    {
+        cout << "Number is not valid";
+        temp->name = "";
+    }
 
-    temp -> next = head;
+    temp->next = head;
     head = temp;
 }
 
-
-void deleteNodeWithValue(Node*& head) {
-
-    string target;
-    cout << "Enter Name of the contact to be deleted: " << endl;
-    cin >> target;
-
-    for(int i =0; i<target.size(); i++){
-        target[i] = toLowerCase(target[i]);
-    }
-
-    // when the linked list is empty
-    if (head == NULL) {
+void deleteNodeWithValue(Node *&head)
+{
+    if (head == NULL)
+    {
         cout << "Contact list is empty." << endl;
         return;
     }
 
-    // when node to be deleted is head node
-    if (head -> name == target) {
-        Node* temp = head;
-        head = head -> next;
-        delete temp;
-        return;
-    }
-
-    // Traverse the linked list to find the node before the target node
-    Node* current = head;
-    while (current -> next != NULL && (current -> next) -> name != target) {
-        current = current -> next;
-    }
-
-    // Check if the target node was found
-    if (current -> next == NULL) {
-        cout << "Contact with name " << target << " not found in the Contact list." << endl;
-        return;
-    }
-
-    // Delete the target node
-    Node* temp = current -> next;
-    current -> next = (current -> next) -> next;
-    delete temp;
-}
-
-
-void search(Node* & head) {
-    int found = 0;
     string target;
-    cout << "Enter name of the contact to be searched: "<<endl;
-    cin>>target;
+    cout << "Enter Name of the contact to be deleted: ";
+    cin.ignore(); // To handle leftover newline from previous input
+    getline(cin, target);
 
-    for(int i =0; i<target.size(); i++){
+    // Convert the target to lowercase for case-insensitive comparison
+    for (int i = 0; i < target.size(); i++)
+    {
         target[i] = toLowerCase(target[i]);
     }
 
-        Node* current_node = head;
-        while (current_node) {
-            if (current_node -> name == target) {
-            cout << "The contact is found. " << endl;
-            cout << "Name is: " << current_node -> name << endl;
-            cout << "Number is: " << current_node -> number << endl;
-            found++;
-            }
-            current_node = current_node -> next;
+    Node *temp = head;
+    Node *prev = NULL;
+
+    // Traverse the list to find the target node
+    while (temp != NULL)
+    {
+        string lowerName = temp->name;
+        for (int i = 0; i < lowerName.size(); i++)
+        {
+            lowerName[i] = toLowerCase(lowerName[i]);
         }
-        if(found == 0){
+
+        if (lowerName == target)
+        {
+            if (prev == NULL)
+            {
+                head = temp->next;
+            }
+            else
+            {
+                prev->next = temp->next;
+            }
+            delete temp;
+            cout << "Contact deleted successfully." << endl;
+            return;
+        }
+        prev = temp;
+        temp = temp->next;
+    }
+
+    cout << "Contact with name " << target << " not found." << endl;
+}
+
+void search(Node *&head)
+{
+    int found = 0;
+    string target;
+    cout << "Enter name of the contact to be searched: " << endl;
+
+    cin.ignore(); // To handle any leftover newline characters from previous input
+    getline(cin, target);
+
+    // Convert the target name to lowercase
+    for (int i = 0; i < target.size(); i++)
+    {
+        target[i] = toLowerCase(target[i]);
+    }
+
+    Node *current_node = head;
+    while (current_node)
+    {
+        string lowerName = current_node->name;
+        for (int i = 0; i < lowerName.size(); i++)
+        {
+            lowerName[i] = toLowerCase(lowerName[i]);
+        }
+
+        if (lowerName == target)
+        {
+            cout << "The contact is found." << endl;
+            cout << "Name is: " << current_node->name << endl;
+            cout << "Number is: " << current_node->number << endl;
+            found++;
+        }
+        current_node = current_node->next;
+    }
+
+    if (found == 0)
+    {
         cout << "Contact not found" << endl;
     }
 }
 
-int getLength(Node* head) {
+int getLength(Node *head)
+{
     int len = 0;
-    Node* temp  = head -> next ;
+    Node *temp = head;
 
-    while(temp != NULL && temp -> name != "") {
+    while (temp != NULL)
+    {
         len++;
-        temp  = temp -> next;
+        temp = temp->next;
     }
     return len;
 }
 
-
-void update(Node* & head) {
+void update(Node *&head)
+{
     string target, newName, newNumber;
-    cin.ignore();
-    cout<<"Enter the name of contact to be edited: ";
-    getline(cin,target);
+    cout << "Enter the name of contact to be edited: ";
+    cin.ignore(); // To handle any leftover newline characters from previous input
+    getline(cin, target);
 
-    for(int i =0; i<target.size(); i++){
+    for (int i = 0; i < target.size(); i++)
+    {
         target[i] = toLowerCase(target[i]);
     }
 
-    Node* temp  = head ;
+    Node *temp = head;
+    bool found = false;
 
-    while(temp != NULL) {
-        if(temp -> name == target){
-            cout << endl << "Enter new name: ";
-            cin >> newName;
-            cout << endl << "Enter new Number: ";
-//            cin>>newNumber;
-            string tempNum;
-        cin>>tempNum;
-
-        bool isValid = isValidNumber(tempNum);
-        if(isValid){
-          temp -> name = newName;
-          temp -> number = tempNum;
-      }
-      else{
-        cout<<"Number is not valid";
-        break;
-      }
+    while (temp != NULL)
+    {
+        string lowerName = temp->name;
+        for (int i = 0; i < lowerName.size(); i++)
+        {
+            lowerName[i] = toLowerCase(lowerName[i]);
         }
-        else{
-        temp  = temp -> next;
+
+        if (lowerName == target)
+        {
+            cout << "Contact found." << endl;
+            cout << "Enter new name (or press Enter to keep the current name): ";
+            getline(cin, newName);
+
+            if (!newName.empty())
+            {
+                temp->name = newName;
+            }
+
+            cout << "Enter new number (or press Enter to keep the current number): ";
+            getline(cin, newNumber);
+
+            if (!newNumber.empty())
+            {
+                if (isValidNumber(newNumber))
+                {
+                    temp->number = newNumber;
+                }
+                else
+                {
+                    cout << "Invalid number. The contact update was canceled." << endl;
+                    return;
+                }
+            }
+
+            found = true;
+            break;
+        }
+        temp = temp->next;
     }
-    cout << endl;
+
+    if (!found)
+    {
+        cout << "Contact with the name " << target << " not found." << endl;
+    }
+    else
+    {
+        cout << "Contact updated successfully." << endl;
+    }
 }
-}
 
+void copyToFile(Node *&head)
+{
+    ofstream outputFile("jp.txt", ios::out | ios::trunc);
 
-void copyToFile(Node* & head){
-  ofstream outputFile;
-
-    outputFile.open("jp.txt", ios::out | ios::trunc);
-
-    if (outputFile.is_open()) {
-
-        while(head != NULL){
-
-          if(head -> name == ""){
-            head = head->next;
-      }
-
-        outputFile << head -> name << ",";
-        outputFile << head -> number << endl;
-        head = head -> next;
+    if (outputFile.is_open())
+    {
+        Node *temp = head;
+        while (temp != NULL)
+        {
+            outputFile << temp->name << "," << temp->number << endl;
+            temp = temp->next;
         }
 
         outputFile.close();
-        cout << endl<< "Data has been written to the file successfully." << endl << endl;
-    } 
-
-    else {
-        cout << "Error: Unable to open the file." <<endl;
+        cout << endl
+             << "Data has been written to the file successfully." << endl
+             << endl;
+    }
+    else
+    {
+        cout << "Error: Unable to open the file." << endl;
     }
 }
 
+int main()
+{
 
-int main() {
+    int length = 0;
+    Node *head = NULL;
+    Node *tail = NULL;
 
-int length=0; //will be used in counting case
+    ifstream myFileStream("jp.txt");
 
-ifstream myFileStream("jp.txt");
+    if (!myFileStream.is_open())
+    {
+        cout << "Failed to open file" << endl;
+        return 0;
+    }
 
-  if(!myFileStream.is_open()){
-    cout << "Failed to open file" << endl;
-    return 0;
-  }
+    string line;
+    while (getline(myFileStream, line))
+    {
+        stringstream ss(line);
+        string name, number;
+        getline(ss, name, ',');
+        getline(ss, number, ',');
 
-  string line;
+        Node *newNode = new Node();
+        newNode->name = name;
+        newNode->number = number;
 
-    Node* newNode = new Node();
-    Node* head = newNode;
+        if (head == NULL)
+        {
+            head = newNode;
+            tail = newNode;
+        }
+        else
+        {
+            tail->next = newNode;
+            tail = newNode;
+        }
+    }
 
-    while(getline(myFileStream, line)){
-
-    stringstream ss(line);
-
-    getline(ss, head -> name, ',');   
-    //it will take the text of the line in name untill a  comma(,) will come.
-    getline(ss, head -> number, ',');
-
-    Node* temp = new Node();    //adding a new node everytime
-    temp -> next = head;
-      head = temp;
-  }
+    myFileStream.close();
 
     int operation;
-//    bool check = true;
-//while(check){
+    cout << endl;
+    cout << " CONTACT MANAGEMENT SYSTEM APPLICATION " << endl;
+    cout << endl
+         << endl;
+    cout << "  ---------- CONTACT LIST ---------- " << endl;
+    cout << endl;
+    cout << "S.NO    " << "FUNCTIONS                    " << endl;
+    cout << endl;
+    cout << " 1      " << "Insert Contact               " << endl;
+    cout << " 2      " << "Delete Contact               " << endl;
+    cout << " 3      " << "Search Contact               " << endl;
+    cout << " 4      " << "Update Contact               " << endl;
+    cout << " 5      " << "Display Contacts             " << endl;
+    cout << " 6      " << "Exit                         " << endl;
+    cout << endl;
 
-    //Interface Creation
-    cout<<endl;
-    cout<<" CONTACT MANAGEMENT SYSTEM APPLICATION "<<endl;
-    cout<<endl<<endl;
-    cout<<"  ---------- CONTACT LIST ---------- "<<endl;
-    cout<<endl;
-    cout<<"S.NO    "<<"FUNCTIONS                    "<<endl;
-    cout<<endl;
-    cout<<" 1      "<<"Insert Contact               "<<endl;
-    cout<<" 2      "<<"Delete Contact               "<<endl;
-    cout<<" 3      "<<"Update Contact               "<<endl;
-    cout<<" 4      "<<"Search Contact               "<<endl;
-    cout<<" 5      "<<"Count Contacts               "<<endl;
-    cout<<" 6      "<<"Show All Contacts            "<<endl;
-    cout<<" 7      "<<"Exit                         "<<endl;
-    cout<<"Enter the operation(1-7): ";
+    bool flag = true;
 
-    cin>>operation;
-    cout<<endl;
+    while (flag)
+    {
+        cout << endl
+             << endl;
+        cout << "Please enter the S.NO of function you want to do: ";
+        cin >> operation;
 
-    switch(operation){
+        switch (operation)
+        {
+        case 1:
+            insertAtHead(head);
+            copyToFile(head); // Save after insertion
+            break;
 
-        case 1: 
-        insertAtHead(head);
-        copyToFile(head);
-        break;
+        case 2:
+            deleteNodeWithValue(head);
+            copyToFile(head); // Save after deletion
+            break;
 
-        case 2: 
-        deleteNodeWithValue(head);
-        copyToFile(head);
-        break;
+        case 3:
+            search(head);
+            break;
 
-        case 3: 
-        update(head);
-        copyToFile(head);
-        break;
+        case 4:
+            update(head);
+            copyToFile(head); // Save after update
+            break;
 
-        case 4: 
-        search(head);
-        break;
-
-        case 5: 
-        length = getLength(head);
-        cout << "Total contacts are: " << length << endl;
-        break;
+        case 5:
+            print(head);
+            break;
 
         case 6:
-        print(head);
-        break;
+            copyToFile(head); // Save before exiting
+            flag = false;
+            break;
 
-        case 7:
-        //check = false;
-        break;
+        default:
+            cout << "Invalid S.NO" << endl;
+        }
+    }
 
-    //}
-}
     return 0;
 }
